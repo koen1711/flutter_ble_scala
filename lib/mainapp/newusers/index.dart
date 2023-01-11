@@ -6,3 +6,4 @@ import 'WelcomeScreen.dart';
 class AgreementScreen extends AAgreementScreen {}
 
 class WelcomeScreen extends AWelcomeScreen {}
+

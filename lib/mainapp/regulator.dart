@@ -6,7 +6,7 @@ import 'newusers/index.dart';
 import './navigator.dart';
 var bleHandler = BluetoothHandler();
 
-MaterialApp regulator(var json) {
+MaterialApp regulator(var json, String licenseText) {
   // check if new user from data.json ()
   
 
@@ -14,7 +14,7 @@ MaterialApp regulator(var json) {
     print("New user");
     return MaterialApp(
         home: WelcomeScreen(),
-        routes: newUserRoutes(),
+        routes: newUserRoutes(licenseText),
       );
   } else {
     print("a");

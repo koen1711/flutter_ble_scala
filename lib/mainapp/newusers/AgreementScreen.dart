@@ -147,7 +147,9 @@ class _AgreementScreen extends State<AAgreementScreen> {
                     Align(
                       alignment: Alignment.center,
                       child: MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed('/License');
+                        },
                         color: Color(0xffffffff),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -157,7 +159,7 @@ class _AgreementScreen extends State<AAgreementScreen> {
                         padding:
                             EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Text(
-                          "Click here for the Terms of Use",
+                          "Click here for the LICENSE",
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -170,7 +172,7 @@ class _AgreementScreen extends State<AAgreementScreen> {
                       ),
                     ),
                     Text(
-                      "By checking the Check Box below you agree to the Terms of Use listed above",
+                      "By checking the Check Box below you agree to the LICENSE listed above",
                       textAlign: TextAlign.start,
                       overflow: TextOverflow.clip,
                       style: TextStyle(
