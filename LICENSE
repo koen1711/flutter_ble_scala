@@ -1,0 +1,31 @@
+Custom License
+
+Copyright (c) 2023 Author: Koen van Urk
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software for non-commercial use. Anyone who violates this will face a fine of 1,000 USD. No person shall be allowed to copy, sell or distrubute this software other then the Author, infrengement of this copy right will face a fine of 1,000 USD. Any infremgements of the section initiated by the "Rules: " keyword and ended by "End of rules" must also be followed and if not you will face a 1,000 USD fine. This claim is subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+Rules: 
+    1. Anyone who uses this Software also agrees to the Terms of Use (Stated in the secton initiated by the keyword "Terms of Use: ").
+    2. Any ":" initiates a section that automatically is agreed to when agreeing to the license as long as 4 spaces are infront of the line it is part of the section initiated with the ":".
+End of rules
+
+
+Terms of Use:
+    1. The Developer may distrubute this Software in all ways he wishes.
+    2. If you agree to this Terms of Use you also agree to the latests version of this License and are required to keep yourself update. The Developer of this Software is not required to give you an update notice. The License can be found here: https://github.com/koen1711/flutter_ble_scala/blob/master/LICENSE
+
+Definitions:
+    Author: Koen van Urk
+    Developer: Author
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
