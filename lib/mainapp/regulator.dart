@@ -14,14 +14,16 @@ MaterialApp regulator(var json, String licenseText) {
     print("New user");
     return MaterialApp(
         home: WelcomeScreen(),
-        routes: newUserRoutes(licenseText),
+        routes: routes(licenseText),
       );
   } else {
     print("a");
     return MaterialApp(
+        routes: routes(licenseText),
         home: Scaffold(
       body: Center(
         child: Text("a"),
+        
       ),
     ));
   }

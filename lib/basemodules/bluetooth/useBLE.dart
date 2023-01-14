@@ -17,47 +17,30 @@ class BluetoothHandler {
     list.add(await Permission.bluetoothConnect.status.isGranted);
     list.add(await Permission.bluetoothScan.status.isGranted);
 
-
     return (list.contains(false) ? false : true);
   }
 
-  Future<void> requestPermissions() async {
+  Future<void> requestPermissions(cb) async {
     // Check for permissions
     if (await checkPermissions() == true) {
-      return;
+      return cb(true);
     }
 
-    
-    await Permission.locationWhenInUse.status.then((status) {
-      if (status.isRestricted || status.isDenied) {
-        Permission.locationWhenInUse.request();
-      }
-    });
-    // wait for request 1 to be finished
+    var list = [];
 
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.locationWhenInUse,
+      Permission.bluetooth,
+      Permission.bluetoothAdvertise,
+      Permission.bluetoothConnect,
+      Permission.bluetoothScan,
+      //add more permission to request here.
+    ].request();
 
-
-    await Permission.bluetooth.status.then((status) {
-      if (status.isRestricted || status.isDenied) {
-        Permission.bluetooth.request();
-      }
-    });
-    await Permission.bluetoothAdvertise.status.then((status) {
-      if (status.isRestricted || status.isDenied) {
-        Permission.bluetoothAdvertise.request();
-      }
-    });
-    await Permission.bluetoothConnect.status.then((status) {
-      if (status.isRestricted || status.isDenied) {
-        Permission.bluetoothConnect.request();
-      }
-    });
-
-    await Permission.bluetoothScan.status.then((status) {
-      if (status.isRestricted || status.isDenied) {
-        Permission.bluetoothScan.request();
-      }
-    });
+    if (await checkPermissions() == true) {
+      return cb(true);
+    }
+    return cb(false);
   }
 
   Future<bool?> checkBluetooth() async {

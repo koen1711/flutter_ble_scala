@@ -154,7 +154,7 @@ class _AgreementScreen extends State<AAgreementScreen> {
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.zero,
-                          side: BorderSide(color: Color(0xff808080), width: 1),
+                          side: BorderSide(color: Color.fromARGB(0, 255, 255, 255), width: 0),
                         ),
                         padding:
                             EdgeInsets.symmetric(horizontal: 16, vertical: 8),

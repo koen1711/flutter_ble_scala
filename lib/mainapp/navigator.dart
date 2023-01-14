@@ -1,15 +1,16 @@
-
-
 import 'package:flutter/material.dart';
 import 'newusers/index.dart';
 import 'newusers/License.dart';
+import './normal/index.dart';
 // add a register routes function
 
-Map<String, WidgetBuilder> newUserRoutes(String licenseText) {
+Map<String, WidgetBuilder> routes(String licenseText) {
   return {
     '/WelcomeScreen': (context) => WelcomeScreen(),
     '/Agreement': (context) => AgreementScreen(),
     '/License': (context) => ALicense(license: licenseText),
-    //'/AllowPerms': (context) => PermissionScree(),
+    '/AllowPerms': (context) => PermissionScreen(),
+    '/HomePage': (context) => HomePage()
   };
 }
+
