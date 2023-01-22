@@ -6,7 +6,6 @@ import 'dart:convert';
 
 class BluetoothHandler {
   // add a class function
-
   // make async function
   Future<bool> checkPermissions() async {
     List<bool> list = [];
@@ -82,11 +81,44 @@ class BluetoothHandler {
     for (var i in tmp.values) {
       re_list.add(CustomBluetoothDevice(i));
     }
-    await re_list[0].connect();
-
-    re_list[0].send("Hello, World!");
 
     return re_list;
+  }
+
+  Future<void> notEndingScan(cb) async {
+    // Scan for devices and get a list of the devices
+    await FlutterBluetoothSerial.instance.cancelDiscovery();
+    
+    if (await checkBluetooth() == false) {
+      await enableBluetooth();
+    }
+
+    FlutterBluetoothSerial.instance.startDiscovery().listen((r) {
+      if (r.device.name != null) {
+        cb(CustomBluetoothDevice(r));
+      }
+    }).onDone(() {
+      // keep on scanning for devices
+      notEndingScan(cb);
+    });
+  }
+
+  Future<void> notEndingRecieving(CustomBluetoothDevice device, cb) async {
+    // Recieve data from a device
+    device.con.input.listen((data) {
+      cb(device.getDeviceName(), utf8.decode(data));
+    }).onDone(() {
+      // keep on recieving data
+      notEndingRecieving(device, cb);
+    });
+  }
+
+  Future<void> breakAllConnections() async {
+    // Recieve data from a device
+    await FlutterBluetoothSerial.instance.cancelDiscovery();
+    await FlutterBluetoothSerial.instance.requestDisable();
+
+    await FlutterBluetoothSerial.instance.requestEnable();
   }
 }
 

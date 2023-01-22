@@ -8,9 +8,10 @@ Map<String, WidgetBuilder> routes(String licenseText) {
   return {
     '/WelcomeScreen': (context) => WelcomeScreen(),
     '/Agreement': (context) => AgreementScreen(),
-    '/License': (context) => ALicense(license: licenseText),
+    '/License': (context) => ALicense(licenseText),
     '/AllowPerms': (context) => PermissionScreen(),
-    '/HomePage': (context) => HomePage()
+    '/HomePage': (context) => HomePage(),
+    '/senddata': (context) => SendData(),
   };
 }
 

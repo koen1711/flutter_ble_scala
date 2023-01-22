@@ -37,6 +37,7 @@ migrate_working_dir/
 /macos/
 /web/
 /windows/
+# some windows folders are still being pushed
 
 # Symbolication related
 app.*.symbols
@@ -48,3 +49,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+windows/flutter/generated_plugins.cmake

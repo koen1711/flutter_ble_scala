@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 
 
 class AHomeScreen extends StatelessWidget {
+  AHomeScreen();
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('What do you want to do today?'),
+      ),
       backgroundColor: Color(0xfff2f3f4),
       body: SingleChildScrollView(
         child: Column(
@@ -12,22 +17,8 @@ class AHomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                "What do you need to be done ?",
-                textAlign: TextAlign.start,
-                overflow: TextOverflow.clip,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontStyle: FontStyle.normal,
-                  fontSize: 16,
-                  color: Color(0xff000000),
-                ),
-              ),
-            ),
             GridView(
-              padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
               physics: ClampingScrollPhysics(),
