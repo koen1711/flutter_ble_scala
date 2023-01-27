@@ -15,6 +15,9 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
+# ignore all files that contain LAPTOP_KOEN2
+**/LAPTOP_KOEN2/**
+
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
@@ -37,6 +40,10 @@ migrate_working_dir/
 /macos/
 /web/
 /windows/
+/.dart_tool/
+/.idea/
+/.vscode/
+/test/
 # some windows folders are still being pushed
 
 # Symbolication related
