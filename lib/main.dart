@@ -5,13 +5,20 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'background/background.dart';
+// import logger
+import 'package:logger/logger.dart' show Logger, Level;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+  // turn of logging of google_mlkit_translation
+  Logger.level = Level.nothing;
+  // turn of logging of onDeviceTranslator
+  print("Starting main");
+  Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
   final onDeviceTranslator = OnDeviceTranslator(
       sourceLanguage: TranslateLanguage.english,
       targetLanguage: TranslateLanguage.dutch);
+  
   // ignore some logs
   // Check for permissions
   var licenseTexta = await http.get(Uri.parse(
@@ -19,7 +26,6 @@ Future<void> main() async {
   var licenseText = licenseTexta.body.toString();
   // write a file to the document directory.
   // check if the data.json file exists
-  
   var delegate = await LocalizationDelegate.create(
       fallbackLocale: 'nl', supportedLocales: ['en', 'nl']);
   if (delegate.currentLocale == Locale.fromSubtags(languageCode: 'en')) {

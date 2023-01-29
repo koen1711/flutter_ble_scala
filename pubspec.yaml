@@ -48,6 +48,7 @@ dependencies:
   google_mlkit_translation: ^0.5.0
   flutter_localization: ^0.1.9
   flutter_translate: ^4.0.3
+  logger: ^1.1.0
 
 dev_dependencies:
   flutter_test:
