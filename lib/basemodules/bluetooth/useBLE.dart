@@ -7,6 +7,8 @@ import 'dart:convert';
 class BluetoothHandler {
   // add a class function
   // make async function
+  bool _isScanning = false;
+
   Future<bool> checkPermissions() async {
     List<bool> list = [];
 
@@ -58,6 +60,7 @@ class BluetoothHandler {
   }
 
   Future<List> scanDevices() async {
+    _isScanning = true;
     // Scan for devices and get a list of the devices
     await FlutterBluetoothSerial.instance.cancelDiscovery();
     // scan for devices for 10 seconds
@@ -81,11 +84,16 @@ class BluetoothHandler {
     for (var i in tmp.values) {
       re_list.add(CustomBluetoothDevice(i));
     }
-
+    _isScanning = false;
     return re_list;
   }
 
+  Future<void> stopNotEndingScan() async {
+    _isScanning = false;
+  }
+
   Future<void> notEndingScan(cb) async {
+    _isScanning = true;
     // Scan for devices and get a list of the devices
     await FlutterBluetoothSerial.instance.cancelDiscovery();
     
@@ -99,8 +107,11 @@ class BluetoothHandler {
       }
     }).onDone(() {
       // keep on scanning for devices
-      notEndingScan(cb);
+      if (_isScanning == true) {
+        notEndingScan(cb);
+      }
     });
+    _isScanning = false;
   }
 
   Future<void> notEndingRecieving(CustomBluetoothDevice device, cb) async {
