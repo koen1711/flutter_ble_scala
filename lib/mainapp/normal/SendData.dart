@@ -9,7 +9,7 @@ class ASendData extends StatefulWidget {
   _SendData createState() => _SendData();
 }
 
-class _SendData extends State<ASendData> {
+class _SendData extends State<ASendData> with WidgetsBindingObserver {
   _SendData({CustomBluetoothDevice? device});
 
   var bleHandler = BluetoothHandler();
@@ -18,6 +18,32 @@ class _SendData extends State<ASendData> {
   List<CustomBluetoothDevice> _devices = [];
   CustomBluetoothDevice? _selectedDevice;
   TextEditingController _textController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _openSecondScreen();
+        break;
+      case AppLifecycleState.paused:
+        _selectedDevice?.disconnect();
+        break;
+      default:
+        break;
+    }
+  }
+
 
   void _recieveData(String devicename, String data) {
     setState(() {
