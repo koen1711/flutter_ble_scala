@@ -12,13 +12,41 @@ class FindDevices extends StatefulWidget {
   AFindDevices createState() => AFindDevices(onDataSubmitted: onDataSubmitted);
 }
 
-class AFindDevices extends State<FindDevices> {
+class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
   Map<String, CustomBluetoothDevice> _devices = Map();
+  
+  AFindDevices({required this.onDataSubmitted});
 
   final Function(CustomBluetoothDevice) onDataSubmitted;
   bool _isScanning = false;
 
-  AFindDevices({required this.onDataSubmitted});
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        bleHandler.notEndingScan(_addDevice);
+        break;
+      case AppLifecycleState.paused:
+        bleHandler.stopNotEndingScan();
+        break;
+      default:
+        break;
+    }
+  }
+
+
 
   void _addDevice(CustomBluetoothDevice device) {
     setState(() {
@@ -26,67 +54,128 @@ class AFindDevices extends State<FindDevices> {
     });
   }
 
-  Widget _buildContainerDevice(device) {    
+  Widget _buildButton() {
+    if (_isScanning) {
+      return MaterialButton(
+        onPressed: () async {
+          if (_isScanning == true) {
+            return;
+          }
+          _isScanning = false;
+          await bleHandler.stopNotEndingScan();
+        },
+        color: Color.fromARGB(255, 255, 38, 38),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: Color(0xff808080), width: 1),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Text(
+          "Stop Scanning",
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            fontStyle: FontStyle.normal,
+          ),
+        ),
+        textColor: Color(0xff000000),
+        height: MediaQuery.of(context).size.height * 0.05,
+        minWidth: MediaQuery.of(context).size.width,
+      );
+    } else {
+      return MaterialButton(
+        onPressed: () async {
+          if (_isScanning) {
+            return;
+          }
+          _isScanning = true;
+          await bleHandler.notEndingScan(_addDevice);
+        },
+        color: Color(0xff2641ff),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: Color(0xff808080), width: 1),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Text(
+          "Start Scanning",
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            fontStyle: FontStyle.normal,
+          ),
+        ),
+        textColor: Color(0xff000000),
+        height: MediaQuery.of(context).size.height * 0.05,
+        minWidth: MediaQuery.of(context).size.width,
+      );
+    }
+  }
+
+  Widget _buildContainerDevice(device) {
     return Stack(
       alignment: Alignment.centerLeft,
       children: [
-        ElevatedButton(onPressed: () async {
-          await device.connect();
-          onDataSubmitted(device);
-          Navigator.pop(context);
-        }, 
+        ElevatedButton(
+          onPressed: () async {
+            await device.connect();
+            onDataSubmitted(device);
+            Navigator.pop(context);
+          },
           child: Container(
+            alignment: Alignment.center,
+            margin: EdgeInsets.fromLTRB(60, 0, 0, 0),
+            padding: EdgeInsets.all(0),
+            width: MediaQuery.of(context).size.width,
+            // height infinite because of the stack
+            height: 130,
+            decoration: BoxDecoration(
+              color: Color(0xff3a57e8),
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: Align(
               alignment: Alignment.center,
-              margin: EdgeInsets.fromLTRB(60, 0, 0, 0),
-              padding: EdgeInsets.all(0),
-              width: MediaQuery.of(context).size.width,
-              // height infinite because of the stack
-              height: 130,
-              decoration: BoxDecoration(
-                color: Color(0xff3a57e8),
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Align(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "${device.getDeviceName()}",
+                      textAlign: TextAlign.start,
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontStyle: FontStyle.normal,
+                        fontSize: 18,
+                        color: Color(0xffffffff),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 8, 0, 12),
+                    child: Align(
                       alignment: Alignment.center,
                       child: Text(
-                        "${device.getDeviceName()}",
+                        "Tap to connect",
                         textAlign: TextAlign.start,
                         maxLines: 1,
                         overflow: TextOverflow.clip,
                         style: TextStyle(
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.normal,
-                          fontSize: 18,
-                          color: Color(0xffffffff),
+                          fontSize: 16,
+                          color: Color(0xffd4d4d4),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 8, 0, 12),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Tap to connect",
-                          textAlign: TextAlign.start,
-                          maxLines: 1,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontStyle: FontStyle.normal,
-                            fontSize: 16,
-                            color: Color(0xffd4d4d4),
-                          ),
-                        ),
-                      ),
-                    ),
+                  ),
                 ],
               ),
             ),
