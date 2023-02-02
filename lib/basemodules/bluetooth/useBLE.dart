@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'dart:convert';
@@ -8,6 +10,7 @@ class BluetoothHandler {
   // add a class function
   // make async function
   bool _isScanning = false;
+  Map<CustomBluetoothDevice, bool> _isRecieving = {};
 
   Future<bool> checkPermissions() async {
     List<bool> list = [];
@@ -90,6 +93,13 @@ class BluetoothHandler {
 
   Future<void> stopNotEndingScan() async {
     _isScanning = false;
+    await FlutterBluetoothSerial.instance.cancelDiscovery();
+  }
+
+  Future<void> stopNotEndingRecieving(CustomBluetoothDevice device) async {
+    _isRecieving[device] = false;
+    device.con.finish();
+    device.connect();
   }
 
   Future<void> notEndingScan(cb) async {
@@ -115,13 +125,18 @@ class BluetoothHandler {
   }
 
   Future<void> notEndingRecieving(CustomBluetoothDevice device, cb) async {
+    _isRecieving[device] = true;
     // Recieve data from a device
     device.con.input.listen((data) {
       cb(device.getDeviceName(), utf8.decode(data));
     }).onDone(() {
       // keep on recieving data
-      notEndingRecieving(device, cb);
+      if (_isRecieving[device] == true) {
+        notEndingRecieving(device, cb);
+      }
     });
+
+    _isRecieving[device] = false;
   }
 
   Future<void> breakAllConnections() async {
@@ -150,7 +165,11 @@ class CustomBluetoothDevice {
   }
 
   Future<bool> connect() async {
-    con = await BluetoothConnection.toAddress(getDeviceAddress());
+    try {
+      con = await BluetoothConnection.toAddress(getDeviceAddress());
+    } catch (e) {
+      return false;
+    }
     if (con.toString() == "Instance of 'BluetoothConnection'") {
       return true;
     } else {

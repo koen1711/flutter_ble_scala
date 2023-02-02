@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 
 class AHomeScreen extends StatelessWidget {
   AHomeScreen();
   
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return Scaffold(
       appBar: AppBar(
-        title: Text('What do you want to do today?'),
+        title: Center(child: Text('What do you want to do today?', style: TextStyle(color: Colors.black))),
+        // make the appbar transparent
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       backgroundColor: Color(0xfff2f3f4),
       body: SingleChildScrollView(
@@ -41,7 +45,7 @@ class AHomeScreen extends StatelessWidget {
                     ),
                     child: ElevatedButton(
                       onPressed: () => {
-                        Navigator.pushNamed(context, '/pincontrol')
+                        Navigator.pushNamed(context, '/joystick')
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -62,7 +66,7 @@ class AHomeScreen extends StatelessWidget {
                           Padding(
                             padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
                             child: Text(
-                              "Pin Control",
+                              "Control your leaphy",
                               textAlign: TextAlign.start,
                               overflow: TextOverflow.clip,
                               style: TextStyle(

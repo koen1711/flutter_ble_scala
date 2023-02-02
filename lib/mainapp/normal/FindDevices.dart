@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_ble_scala/mainapp/newusers/PermissionsScreen.dart';
 import '../../basemodules/bluetooth/useBLE.dart';
 import 'SendData.dart';
@@ -14,12 +15,12 @@ class FindDevices extends StatefulWidget {
 
 class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
   Map<String, CustomBluetoothDevice> _devices = Map();
-  
+  bool _isScanning = false;
+
   AFindDevices({required this.onDataSubmitted});
 
   final Function(CustomBluetoothDevice) onDataSubmitted;
-  bool _isScanning = false;
-
+  
 
   @override
   void initState() {
@@ -46,8 +47,6 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
     }
   }
 
-
-
   void _addDevice(CustomBluetoothDevice device) {
     setState(() {
       _devices[device.getDeviceName()] = device;
@@ -55,13 +54,12 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
   }
 
   Widget _buildButton() {
-    if (_isScanning) {
+    if (_isScanning == true) {
       return MaterialButton(
         onPressed: () async {
-          if (_isScanning == true) {
-            return;
-          }
-          _isScanning = false;
+          setState(() {
+            _isScanning = false;
+          });
           await bleHandler.stopNotEndingScan();
         },
         color: Color.fromARGB(255, 255, 38, 38),
@@ -86,10 +84,9 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
     } else {
       return MaterialButton(
         onPressed: () async {
-          if (_isScanning) {
-            return;
-          }
-          _isScanning = true;
+          setState(() {
+            _isScanning = true;
+          });
           await bleHandler.notEndingScan(_addDevice);
         },
         color: Color(0xff2641ff),
@@ -120,7 +117,15 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
       children: [
         ElevatedButton(
           onPressed: () async {
-            await device.connect();
+            bool r = await device.connect();
+            if (r == false) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Could not connect to device"),
+                ),
+              );
+              return;
+            }
             onDataSubmitted(device);
             Navigator.pop(context);
           },
@@ -197,6 +202,7 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return Scaffold(
       backgroundColor: Color(0xffffffff),
       appBar: AppBar(
@@ -236,33 +242,7 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
               ],
             ),
           ),
-          MaterialButton(
-            onPressed: () async {
-              if (_isScanning) {
-                return;
-              }
-              _isScanning = true;
-              await bleHandler.notEndingScan(_addDevice);
-            },
-            color: Color(0xff2641ff),
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-              side: BorderSide(color: Color(0xff808080), width: 1),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              "Start Scanning",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                fontStyle: FontStyle.normal,
-              ),
-            ),
-            textColor: Color(0xff000000),
-            height: MediaQuery.of(context).size.height * 0.05,
-            minWidth: MediaQuery.of(context).size.width,
-          ),
+          _buildButton(),
         ],
       ),
     );

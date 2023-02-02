@@ -34,16 +34,17 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        _openSecondScreen();
+        _selectedDevice?.connect();
+        bleHandler.stopNotEndingRecieving(_selectedDevice!);
         break;
       case AppLifecycleState.paused:
         _selectedDevice?.disconnect();
+        bleHandler.notEndingRecieving(_selectedDevice!, _recieveData);
         break;
       default:
         break;
     }
   }
-
 
   void _recieveData(String devicename, String data) {
     setState(() {
@@ -116,12 +117,12 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
   Widget _textField() {
     if (_selectedDevice == null) {
       return ElevatedButton(
-        onPressed: () {
-          _openSecondScreen();
-        }, 
-        child: Text("Select Device")
-      );
+          onPressed: () {
+            _openSecondScreen();
+          },
+          child: Text("Select Device"));
     }
+    bleHandler.notEndingRecieving(_selectedDevice!, _recieveData);
     return TextField(
       controller: _textController,
       obscureText: false,
@@ -240,7 +241,6 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
                     ),
                     ElevatedButton(
                         onPressed: () {
-                          print(_textController.text);
                           _sendData("You", _textController.text);
                         },
                         child: Container(
