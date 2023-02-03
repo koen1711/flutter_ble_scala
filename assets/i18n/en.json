@@ -4,6 +4,24 @@
             "text1": "Welcome",
             "text2": "Welcome to this app!",
             "text3": "Get Started"
+        },
+        "licensescreen": {
+            "text1": "Continue to Allowing Permissions",
+            "text2": "Agreement",
+            "text3": "Click here for the LICENSE",
+            "text4": "By checking the Check Box below you agree to the LICENSE listed above"
+        },
+        "license": {
+            "text1": "LICENSE"
+        },
+        "permissionscreen": {}
+    },
+    "normal": {
+        "homepage": {
+            "text1": "What do you want to do today?",
+            "text2": "Control your leaphy",
+            "text3": "Send data",
+            "text4": "Edit commands"
         }
     }
 }

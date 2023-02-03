@@ -4,6 +4,24 @@
             "text1": "Welkom",
             "text2": "Welkom in deze app!",
             "text3": "Begin"
+        },
+        "licensescreen": {
+            "text1": "Ga door naar Machtigingen Toestaan",
+            "text2": "Afspraak",
+            "text3": "Klik hier voor de LICENSIE",
+            "text4": "Bij aanvinken van de Aanvink Knop hieronder ga je akkoord met de LICENSIE hierboven"
+        },
+        "license": {
+            "text1": "LICENSIE"
+        },
+        "permissionscreen": {}
+    },
+    "normal": {
+        "homepage": {
+            "text1": "Home",
+            "text2": "Welkom in deze app!",
+            "text3": "Ga naar de volgende pagina",
+            "text4": "Ga naar de vorige pagina"
         }
     }
 }

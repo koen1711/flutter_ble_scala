@@ -1,3 +1,4 @@
+import 'package:flutter_ble_scala/mainapp/normal/HomePage.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:flutter/material.dart';
 import 'FindDevices.dart';
@@ -18,6 +19,7 @@ class AJoystick extends StatefulWidget {
 }
 
 class _Joystick extends State<AJoystick> {
+  bool a = false;
   double _x = 100;
   double _y = 100;
   CustomBluetoothDevice? _selectedDevice;
@@ -67,11 +69,21 @@ class _Joystick extends State<AJoystick> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+    if (a == false) {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+    }
+    a = true;
     return Scaffold(
       backgroundColor: Colors.green,
       appBar: AppBar(
         title: const Text('Drive your leaphy'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AHomeScreen()));
+          },
+        )
       ),
       body: SafeArea(
         child: Stack(

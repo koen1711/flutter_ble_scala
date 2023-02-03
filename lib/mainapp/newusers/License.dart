@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:http/http.dart';
 
 class ALicense extends StatefulWidget {
@@ -18,7 +19,7 @@ class _ALicenseState extends State<ALicense> {
   _ALicenseState(this.license);
 
   Widget _language(context) {
-    if (!license.startsWith("Aangepaste")) {
+    if (!license.startsWith("Versie")) {
       return Text("Official License");
     }
     return Container(
@@ -70,7 +71,7 @@ class _ALicenseState extends State<ALicense> {
             borderRadius: BorderRadius.zero,
           ),
           title: Text(
-            "LICENSE",
+            translate("newusers.licensescreen.text2"),
             style: TextStyle(
               fontWeight: FontWeight.w400,
               fontStyle: FontStyle.normal,

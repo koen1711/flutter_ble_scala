@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../basemodules/bluetooth/useBLE.dart';
 import 'FindDevices.dart';
+import '../modals/ModalsSendData.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class ASendData extends StatefulWidget {
   ASendData({CustomBluetoothDevice? device});
@@ -27,6 +30,7 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    super.dispose();
     WidgetsBinding.instance.removeObserver(this);
   }
 
@@ -35,11 +39,11 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         _selectedDevice?.connect();
-        bleHandler.stopNotEndingRecieving(_selectedDevice!);
+        bleHandler.notEndingRecieving(_selectedDevice!, _recieveData);
         break;
       case AppLifecycleState.paused:
         _selectedDevice?.disconnect();
-        bleHandler.notEndingRecieving(_selectedDevice!, _recieveData);
+        bleHandler.stopNotEndingRecieving(_selectedDevice!);
         break;
       default:
         break;
@@ -53,11 +57,10 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
   }
 
   void _sendData(String devicename, String data) {
+    _selectedDevice?.send(data);
     setState(() {
       if (_selectedDevice != null) {
         _data.add({"You": data});
-        print("You: $_data");
-        _selectedDevice?.send(data);
       }
     });
   }
@@ -118,6 +121,7 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
     if (_selectedDevice == null) {
       return ElevatedButton(
           onPressed: () {
+            // open the SendDataModal
             _openSecondScreen();
           },
           child: Text("Select Device"));
@@ -177,18 +181,24 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
   }
 
   void _openSecondScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FindDevices(
-          onDataSubmitted: (CustomBluetoothDevice data) {
-            setState(() {
-              _selectedDevice = data;
-            });
-          },
-        ),
+    showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => FindDevices(
+        onDataSubmitted: (CustomBluetoothDevice data) {
+          setState(() {
+            _selectedDevice = data;
+          });
+        },
       ),
     );
+  }
+
+  void _openQuickCommands() {
+    showCupertinoModalBottomSheet(
+        context: context,
+        builder: (context) => QuickCommands(onDataSubmitted: (String data) {
+              _sendData("You", data);
+            }));
   }
 
   @override
@@ -229,12 +239,34 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
                 child: _buildTexts(),
               ),
               Padding(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.all(4),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.max,
                   children: [
+                    ElevatedButton(
+                        // what is the color of the button
+                        onPressed: () {
+                          // open the QuickCommands modal
+                          _openQuickCommands();
+                        },
+                        child: Container(
+                          margin: EdgeInsets.fromLTRB(4, 0, 0, 0),
+                          padding: EdgeInsets.all(0),
+                          width: 10,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Icon(
+                            Icons.help,
+                            color: Color(0xffffffff),
+                            size: 15,
+                          ),
+                        )),
                     Expanded(
                       flex: 1,
                       child: _textField(),
@@ -246,17 +278,19 @@ class _SendData extends State<ASendData> with WidgetsBindingObserver {
                         child: Container(
                           margin: EdgeInsets.fromLTRB(4, 0, 0, 0),
                           padding: EdgeInsets.all(0),
-                          width: 40,
-                          height: 45,
+                          width: 10,
+                          height: 20,
                           decoration: BoxDecoration(
-                            color: Color(0xff3a57e8),
+                            color: Colors.transparent,
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          child: Icon(
-                            Icons.arrow_forward_ios,
-                            color: Color(0xffffffff),
-                            size: 18,
+                          child: Center(
+                            child: Icon(
+                              Icons.arrow_forward_ios,
+                              color: Color(0xffffffff),
+                              size: 15,
+                            ),
                           ),
                         )),
                   ],

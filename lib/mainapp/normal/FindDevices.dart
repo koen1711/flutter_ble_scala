@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_ble_scala/mainapp/newusers/PermissionsScreen.dart';
 import '../../basemodules/bluetooth/useBLE.dart';
 import 'SendData.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class FindDevices extends StatefulWidget {
   final Function(CustomBluetoothDevice) onDataSubmitted;
@@ -30,6 +32,7 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    super.dispose();
     WidgetsBinding.instance.removeObserver(this);
   }
 
@@ -89,10 +92,10 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
           });
           await bleHandler.notEndingScan(_addDevice);
         },
-        color: Color(0xff2641ff),
+        color: Colors.cyan,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
+          borderRadius: BorderRadius.circular(8.0),
           side: BorderSide(color: Color(0xff808080), width: 1),
         ),
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -106,7 +109,7 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
         ),
         textColor: Color(0xff000000),
         height: MediaQuery.of(context).size.height * 0.05,
-        minWidth: MediaQuery.of(context).size.width,
+        minWidth: MediaQuery.of(context).size.width / 1.2,
       );
     }
   }
@@ -203,48 +206,47 @@ class AFindDevices extends State<FindDevices> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    return Scaffold(
-      backgroundColor: Color(0xffffffff),
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        backgroundColor: Color(0x00ffffff),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-        ),
-        title: Text(
-          "Devices found",
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontStyle: FontStyle.normal,
-            fontSize: 20,
-            color: Color(0xff000000),
-          ),
-        ),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Expanded(
-            flex: 1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: _buildListView(),
+    return Material(
+      child: WillPopScope(
+        onWillPop: () async {
+          return true;
+        },
+        child: Navigator(
+          onGenerateRoute: (_) => MaterialPageRoute(
+            builder: (context) => Builder(
+              builder: (context) => CupertinoPageScaffold(
+                navigationBar: CupertinoNavigationBar(
+                    leading: Container(), middle: Text('Quick Commands')),
+                child: SafeArea(
+                    bottom: false,
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: _buildListView(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _buildButton(),
+                  ],
                 ),
-              ],
+                )
+              ),
             ),
           ),
-          _buildButton(),
-        ],
-      ),
+        ),
+      ),                                              
     );
   }
 }

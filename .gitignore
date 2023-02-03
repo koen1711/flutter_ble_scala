@@ -39,6 +39,7 @@ migrate_working_dir/
 /windows/
 # some windows folders are still being pushed
 
+
 # Symbolication related
 app.*.symbols
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_ble_scala/mainapp/regulator.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../basemodules/sqlite/useSQL.dart';
 
@@ -52,7 +53,7 @@ class _AgreementScreen extends State<AAgreementScreen> {
         ),
         padding: EdgeInsets.all(16),
         child: Text(
-          "Continue to Allowing Permissions",
+          translate("newusers.licensescreen.text1"),
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -73,7 +74,7 @@ class _AgreementScreen extends State<AAgreementScreen> {
         ),
         padding: EdgeInsets.all(16),
         child: Text(
-          "Continue to Allowing Permissions",
+          translate("newusers.licensescreen.text1"),
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,
@@ -157,7 +158,7 @@ class _AgreementScreen extends State<AAgreementScreen> {
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          "Agreement",
+                          translate("newusers.licensescreen.text2"),
                           textAlign: TextAlign.start,
                           overflow: TextOverflow.clip,
                           style: TextStyle(
@@ -185,7 +186,7 @@ class _AgreementScreen extends State<AAgreementScreen> {
                           padding:
                               EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: Text(
-                            "Click here for the LICENSE",
+                            translate("newusers.licensescreen.text3"),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
@@ -198,7 +199,7 @@ class _AgreementScreen extends State<AAgreementScreen> {
                         ),
                       ),
                       Text(
-                        "By checking the Check Box below you agree to the LICENSE listed above",
+                        translate("newusers.licensescreen.text4"),
                         textAlign: TextAlign.start,
                         overflow: TextOverflow.clip,
                         style: TextStyle(
