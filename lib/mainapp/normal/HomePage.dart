@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class AHomeScreen extends StatelessWidget {
   AHomeScreen();
   
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text('What do you want to do today?', style: TextStyle(color: Colors.black))),
+        title: Center(child: Text(translate("normal.homepage.text1"), style: TextStyle(color: Colors.black))),
         // make the appbar transparent
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -45,7 +44,7 @@ class AHomeScreen extends StatelessWidget {
                     ),
                     child: ElevatedButton(
                       onPressed: () => {
-                        Navigator.pushNamed(context, '/joystick')
+                        Navigator.pushReplacementNamed(context, '/joystick')
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -66,7 +65,7 @@ class AHomeScreen extends StatelessWidget {
                           Padding(
                             padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
                             child: Text(
-                              "Control your leaphy",
+                              translate("normal.homepage.text2"),
                               textAlign: TextAlign.start,
                               overflow: TextOverflow.clip,
                               style: TextStyle(
@@ -119,7 +118,7 @@ class AHomeScreen extends StatelessWidget {
                             Padding(
                               padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
                               child: Text(
-                                "Send data",
+                                translate("normal.homepage.text3"),
                                 textAlign: TextAlign.start,
                                 overflow: TextOverflow.clip,
                                 style: TextStyle(
@@ -133,6 +132,58 @@ class AHomeScreen extends StatelessWidget {
                           ],
                         ),
                       )
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    margin: EdgeInsets.all(0),
+                    padding: EdgeInsets.all(0),
+                    decoration: BoxDecoration(
+                      color: Color(0xffffffff),
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () => {
+                        Navigator.pushReplacementNamed(context, '/joystick')
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Container(
+                            alignment: Alignment.center,
+                            margin: EdgeInsets.all(0),
+                            padding: EdgeInsets.all(0),
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Color(0xff5f75e6),
+                              shape: BoxShape.circle,
+                              // add icon
+                              
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
+                            child: Text(
+                              translate("normal.homepage.text4"),
+                              textAlign: TextAlign.start,
+                              overflow: TextOverflow.clip,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.normal,
+                                fontSize: 13,
+                                color: Color(0xff000000),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+
                     ),
                   ),
                 ),

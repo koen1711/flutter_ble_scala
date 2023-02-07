@@ -125,18 +125,21 @@ class BluetoothHandler {
   }
 
   Future<void> notEndingRecieving(CustomBluetoothDevice device, cb) async {
-    _isRecieving[device] = true;
-    // Recieve data from a device
-    device.con.input.listen((data) {
-      cb(device.getDeviceName(), utf8.decode(data));
-    }).onDone(() {
-      // keep on recieving data
-      if (_isRecieving[device] == true) {
-        notEndingRecieving(device, cb);
-      }
-    });
+    if (_isRecieving == false) {
+      _isRecieving[device] = true;
+      // Recieve data from a device
+      device.con.input.listen((data) {
+        
+        cb(device.getDeviceName(), utf8.decode(data));
+      }).onDone(() {
+        // keep on recieving data
+        if (_isRecieving[device] == true) {
+          notEndingRecieving(device, cb);
+        }
+      });
 
-    _isRecieving[device] = false;
+      _isRecieving[device] = false;
+    }
   }
 
   Future<void> breakAllConnections() async {
@@ -189,6 +192,9 @@ class CustomBluetoothDevice {
     // send data to device
     if (con != null) {
       con.output.add(utf8.encode(data));
-    } else {}
+    } else {
+      connect();
+      con.output.add(utf8.encode(data));
+    }
   }
 }

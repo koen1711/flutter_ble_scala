@@ -59,7 +59,7 @@ class regulator extends StatelessWidget {
 
 regulatorAsync(licenseText) async {
   try {
-    var db = await sqlHandler.openDB(
+    await sqlHandler.openDB(
         "main.db", 1, "CREATE TABLE main (key TEXT, value)");
   } catch (e) {
     // create the table main
