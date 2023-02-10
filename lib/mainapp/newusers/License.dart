@@ -1,20 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:http/http.dart';
+import 'dart:io';
+import 'package:rive_loading/rive_loading.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 class ALicense extends StatefulWidget {
-  String license;
-  ALicense(this.license);
-
-
   @override
-  _ALicenseState createState() => _ALicenseState(license);
+  _ALicenseState createState() => _ALicenseState();
 }
 
 class _ALicenseState extends State<ALicense> {
   // initiate the ALicense with a string parameter called license
-  String license;
-  _ALicenseState(this.license);
+  String license = "";
+  bool _isLoading = true;
+  _ALicenseState();
+
+  Future<String> _licenseGenerate(context) async {
+    // get flutter_translate delegate out of context
+    var delegate = LocalizedApp.of(context).delegate;
+    final onDeviceTranslator = OnDeviceTranslator(
+        sourceLanguage: TranslateLanguage.english,
+        targetLanguage: TranslateLanguage.dutch);
+    var licenseTexta = await http.get(Uri.parse(
+        "https://raw.githubusercontent.com/koen1711/flutter_ble_scala/main/LICENSE"));
+    var licenseText = licenseTexta.body.toString();
+    var version = licenseText.split("\n")[0];
+    var versionNumber = version.split(" ")[1];
+
+    var dir = await getApplicationDocumentsDirectory();
+    var path = dir.path;
+    var nlFile = File('$path/LICENSE$versionNumber-nl.txt');
+    var enFile = File('$path/LICENSE$versionNumber-en.txt');
+    if (await nlFile.exists() && await enFile.exists()) {
+      if (delegate.currentLocale == Locale.fromSubtags(languageCode: 'nl')) {
+        licenseText = await nlFile.readAsString();
+      }
+    } else {
+      var lines = licenseText.split("\n");
+      var translatedLines = [];
+      for (var line in lines) {
+        var translatedLine = await onDeviceTranslator.translateText(line);
+        translatedLines.add(translatedLine);
+      }
+      var dutchText = translatedLines.join("\n");
+      // write the file
+      await nlFile.writeAsString(dutchText);
+      await enFile.writeAsString(licenseText);
+      if (delegate.currentLocale == Locale.fromSubtags(languageCode: 'nl')) {
+        licenseText = dutchText;
+      }
+    }
+    setState(() {
+      license = licenseText;
+      _isLoading = true;
+    });
+    return licenseText;
+  }
 
   Widget _language(context) {
     if (!license.startsWith("Versie")) {
@@ -46,7 +90,8 @@ class _ALicenseState extends State<ALicense> {
             color: Colors.blue[300],
             child: Text("Official License"),
             onPressed: () async {
-              var url = "https://raw.githubusercontent.com/koen1711/flutter_ble_scala/main/LICENSE";
+              var url =
+                  "https://raw.githubusercontent.com/koen1711/flutter_ble_scala/main/LICENSE";
               var response = await get(Uri.parse(url));
               license = response.body;
             },
@@ -58,6 +103,7 @@ class _ALicenseState extends State<ALicense> {
 
   @override
   Widget build(BuildContext context) {
+    _licenseGenerate(context);
     return Scaffold(
       backgroundColor: Color(0xffffffff),
       appBar: AppBar(
@@ -96,17 +142,48 @@ class _ALicenseState extends State<ALicense> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
             children: [
-              Text(
-                license,
-                textAlign: TextAlign.left,
-                overflow: TextOverflow.fade,
-                style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontStyle: FontStyle.normal,
-                  fontSize: 10,
-                  color: Color(0xff000000),
-                ),
-              ),
+              license == ""
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: RiveLoading(
+                                    // width and height are the full  width and height of the screen
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.height,
+                                    name: 'lib/mainapp/newusers/loading.riv',
+                                    loopAnimation: 'Timeline 1',
+                                    isLoading: _isLoading,
+                                    onSuccess: (_) {
+                                      print('Finished');
+                                    },
+                                    onError: (err, stack) {
+                                      print(err);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Text(
+                      license,
+                      textAlign: TextAlign.left,
+                      overflow: TextOverflow.fade,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontStyle: FontStyle.normal,
+                        fontSize: 10,
+                        color: Color(0xff000000),
+                      ),
+                    ),
             ],
           ),
         ],

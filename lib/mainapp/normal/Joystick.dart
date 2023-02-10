@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter_ble_scala/mainapp/normal/HomePage.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:flutter/material.dart';
 import 'FindDevices.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../basemodules/bluetooth/useBLE.dart';
+import '../modals/CalibrateMotors.dart';
+import 'package:async/async.dart';
 
 const ballSize = 20.0;
 const step = 10.0;
@@ -14,12 +19,43 @@ class AJoystick extends StatefulWidget {
   _Joystick createState() => _Joystick();
 }
 
-class _Joystick extends State<AJoystick> {
+class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
   bool a = false;
   double _x = 100;
   double _y = 100;
+  Timer? _timer;
   String _previousCommand = "";
   CustomBluetoothDevice? _selectedDevice;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+          if (_previousCommand != "") {
+            _selectedDevice!.send(_previousCommand);
+          }
+        });
+        break;
+      case AppLifecycleState.paused:
+        _timer?.cancel();
+        break;
+      default:
+        break;
+    }
+  }
 
   void _openSecondScreen() {
     Navigator.push(
@@ -46,40 +82,39 @@ class _Joystick extends State<AJoystick> {
           _y = details.y * 100;
           _x = _x * -1;
           _y = _y * -1;
-          if (_x == -0 && _y == -0) {
-            _selectedDevice!.send("DRIVE,0,0|END|");
-            // send the command for 2 seconds every 0.5 seconds
-            Future.delayed(Duration(seconds: 1), () {
-              _selectedDevice!.send("DRIVE,0,0|END|");
-            }).then((value) => 
-            Future.delayed(Duration(seconds: 1), () {
-              _selectedDevice!.send("DRIVE,0,0|END|");
-            }));
-          } else if (_x == -0) {
+          setState(() {
+            _previousCommand = "DRIVE,0,0";
+          });
+          
+          if (_x == -0) {
             // check if y is positive or negative
             if (_y > 0) {
-              if (_previousCommand != "DRIVE,1,${_y.toInt()}|END|") {
-                _selectedDevice!.send("DRIVE,1,${_y.toInt()}|END|");
-                _previousCommand = "DRIVE,1,${_y.toInt()}|END|";
+              if (_previousCommand != "DRIVE,1,${_y.toInt()}") {
+                setState(() {
+                  _previousCommand = "DRIVE,1,${_y.toInt()}";
+                });
               }
             } else {
-              if (_previousCommand != "DRIVE,2,${_y.toInt()}|END|") {
-                _selectedDevice!.send("DRIVE,2,${_y.toInt()}|END|");
-                _previousCommand = "DRIVE,2,${_y.toInt()}|END|";
+              if (_previousCommand != "DRIVE,2,${_y.toInt()}") {
+                setState(() {
+                  _previousCommand = "DRIVE,2,${_y.toInt()}";
+                });
               }
             }
           } else {
             // check if x is positive or negative
             if (_x > 0) {
-              if (_previousCommand != "DRIVE,3,${_x.toInt()}|END|") {
-                _selectedDevice!.send("DRIVE,3,${_x.toInt()}|END|");
-                _previousCommand = "DRIVE,3,${_x.toInt()}|END|";
+              if (_previousCommand != "DRIVE,3,${_x.toInt()}") {
+                setState(() {
+                  _previousCommand = "DRIVE,3,${_x.toInt()}";
+                });
               }
             } else {
-              if (_previousCommand != "DRIVE,4,${_x.toInt()}|END|") {
-                _selectedDevice!.send("DRIVE,4,${_x.toInt()}|END|");
-                _previousCommand = "DRIVE,4,${_x.toInt()}|END|";
-              }
+              if (_previousCommand != "DRIVE,4,${_x.toInt()}") {
+                setState(() {
+                  _previousCommand = "DRIVE,4,${_x.toInt()}";
+                });
+              }                                                                                                                                         /////////////;[==]............,,,,mmmmmmmmmmmmmmmmmmm,, .
             }
           }
         },
@@ -101,6 +136,11 @@ class _Joystick extends State<AJoystick> {
 
   @override
   Widget build(BuildContext context) {
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (_previousCommand != "") {
+        _selectedDevice!.send(_previousCommand);
+      }
+    });
     a = true;
     return Scaffold(
       backgroundColor: Colors.green,
@@ -121,7 +161,29 @@ class _Joystick extends State<AJoystick> {
             ),
             Align(
               alignment: const Alignment(0, 0.8),
-              child: _joyStick(),
+              child: Column(
+                children: [
+                  _selectedDevice == null ? Container() : ElevatedButton(
+                    onPressed: () async {
+                      // go to calibrate motors modal
+                      showBarModalBottomSheet(context: context, 
+                        builder: (context) => CalibrateMotors(
+                          onDataSubmitted: (r) async {
+                            // send command to calibrate motors
+                            _selectedDevice!.send(r);
+                          },
+                          device: _selectedDevice,
+                        )
+                      );
+                    }, 
+                    child: Container(
+                      width: 200,
+                      child: const Text("Calibrate Motors")
+                    )
+                  ),
+                  _joyStick()
+                ]
+              ),
             ),
           ],
         ),
