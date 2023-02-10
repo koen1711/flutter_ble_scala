@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_ble_scala/mainapp/normal/HomePage.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +16,44 @@ class AJoystick extends StatefulWidget {
   _Joystick createState() => _Joystick();
 }
 
-class _Joystick extends State<AJoystick> {
+class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
   bool a = false;
   double _x = 100;
   double _y = 100;
   String _previousCommand = "";
+  Timer? timer;
   CustomBluetoothDevice? _selectedDevice;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        
+        break;
+      case AppLifecycleState.paused:
+        timer?.cancel();
+        break;
+      default:
+        break;
+    }
+  }
+
+  void _bluetoothHeartbeat() {
+    // run the last command
+    _selectedDevice!.send(_previousCommand);
+  }
 
   void _openSecondScreen() {
     Navigator.push(
@@ -47,38 +81,33 @@ class _Joystick extends State<AJoystick> {
           _x = _x * -1;
           _y = _y * -1;
           if (_x == -0 && _y == -0) {
-            _selectedDevice!.send("DRIVE,0,0|END|");
+            _selectedDevice!.send("DRIVE,0,0|E");
             // send the command for 2 seconds every 0.5 seconds
             Future.delayed(Duration(seconds: 1), () {
-              _selectedDevice!.send("DRIVE,0,0|END|");
-            }).then((value) => 
-            Future.delayed(Duration(seconds: 1), () {
-              _selectedDevice!.send("DRIVE,0,0|END|");
-            }));
+              _selectedDevice!.send("DRIVE,0,0|E");
+            }).then((value) => Future.delayed(Duration(seconds: 1), () {
+                  _selectedDevice!.send("DRIVE,0,0|E");
+                }));
           } else if (_x == -0) {
             // check if y is positive or negative
             if (_y > 0) {
-              if (_previousCommand != "DRIVE,1,${_y.toInt()}|END|") {
-                _selectedDevice!.send("DRIVE,1,${_y.toInt()}|END|");
-                _previousCommand = "DRIVE,1,${_y.toInt()}|END|";
+              if (_previousCommand != "DRIVE,1,${_y.toInt()}|E") {
+                _previousCommand = "DRIVE,1,${_y.toInt()}|E";
               }
             } else {
-              if (_previousCommand != "DRIVE,2,${_y.toInt()}|END|") {
-                _selectedDevice!.send("DRIVE,2,${_y.toInt()}|END|");
-                _previousCommand = "DRIVE,2,${_y.toInt()}|END|";
+              if (_previousCommand != "DRIVE,2,${_y.toInt()}|E") {
+                _previousCommand = "DRIVE,2,${_y.toInt()}|E";
               }
             }
           } else {
             // check if x is positive or negative
             if (_x > 0) {
-              if (_previousCommand != "DRIVE,3,${_x.toInt()}|END|") {
-                _selectedDevice!.send("DRIVE,3,${_x.toInt()}|END|");
-                _previousCommand = "DRIVE,3,${_x.toInt()}|END|";
+              if (_previousCommand != "DRIVE,3,${_x.toInt()}|E") {
+                _previousCommand = "DRIVE,3,${_x.toInt()}|E";
               }
             } else {
-              if (_previousCommand != "DRIVE,4,${_x.toInt()}|END|") {
-                _selectedDevice!.send("DRIVE,4,${_x.toInt()}|END|");
-                _previousCommand = "DRIVE,4,${_x.toInt()}|END|";
+              if (_previousCommand != "DRIVE,4,${_x.toInt()}|E") {
+                _previousCommand = "DRIVE,4,${_x.toInt()}|E";
               }
             }
           }
@@ -101,6 +130,12 @@ class _Joystick extends State<AJoystick> {
 
   @override
   Widget build(BuildContext context) {
+    Duration t = Duration(milliseconds: 100);
+      timer = Timer.periodic(t, (timer) {
+        if (_selectedDevice != null) {
+          _bluetoothHeartbeat();
+        }
+      });
     a = true;
     return Scaffold(
       backgroundColor: Colors.green,
