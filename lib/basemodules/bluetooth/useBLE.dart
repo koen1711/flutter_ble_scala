@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'dart:convert';
+import 'dart:typed_data';
 
 // make a function that initiates all child functions
 
@@ -98,7 +99,7 @@ class BluetoothHandler {
 
   Future<void> stopNotEndingRecieving(CustomBluetoothDevice device) async {
     _isRecieving[device] = false;
-    device.con.finish();
+    device.con!.finish();
     device.connect();
   }
 
@@ -106,7 +107,7 @@ class BluetoothHandler {
     _isScanning = true;
     // Scan for devices and get a list of the devices
     await FlutterBluetoothSerial.instance.cancelDiscovery();
-    
+
     if (await checkBluetooth() == false) {
       await enableBluetooth();
     }
@@ -128,8 +129,7 @@ class BluetoothHandler {
     if (_isRecieving == false) {
       _isRecieving[device] = true;
       // Recieve data from a device
-      device.con.input.listen((data) {
-        
+      device.con!.input!.listen((data) {
         cb(device.getDeviceName(), utf8.decode(data));
       }).onDone(() {
         // keep on recieving data
@@ -157,7 +157,7 @@ class CustomBluetoothDevice {
   CustomBluetoothDevice(this.data);
 
   var data;
-  var con;
+  BluetoothConnection? con;
 
   String getDeviceName() {
     return data.device.name;
@@ -176,6 +176,7 @@ class CustomBluetoothDevice {
     if (con.toString() == "Instance of 'BluetoothConnection'") {
       return true;
     } else {
+      con = null;
       return false;
     }
   }
@@ -183,18 +184,20 @@ class CustomBluetoothDevice {
   void disconnect() {
     // disconnect from device
     if (con != null) {
-      con.close();
+      con!.close();
       con = null;
     }
   }
 
-  void send(String data) {
+  Future<bool> send(String data) async {
     // send data to device
+    final Uint8List dataList = Uint8List.fromList(utf8.encode(data));
     if (con != null) {
-      con.output.add(utf8.encode(data));
+      con!.output.add(dataList);
     } else {
-      connect();
-      con.output.add(utf8.encode(data));
+      await connect();
+      con!.output.add(dataList);
     }
+    return true;
   }
 }

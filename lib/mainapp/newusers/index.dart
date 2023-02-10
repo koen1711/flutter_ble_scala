@@ -10,5 +10,5 @@ class WelcomeScreen extends AWelcomeScreen {}
 class PermissionScreen extends LoadingAnimation {}
 
 class License extends ALicense {
-  License(String licenseText) : super(licenseText);
+  License();
 }

@@ -18,8 +18,8 @@ var bleHandler = BluetoothHandler();
 
 class regulator extends StatelessWidget {
   final json;
-  final licenseText;
-  regulator(this.json, this.licenseText);
+  final r;
+  regulator(this.json, this.r);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class regulator extends StatelessWidget {
           ],
           supportedLocales: localizationDelegate.supportedLocales,
           locale: localizationDelegate.currentLocale,
-          routes: routes(licenseText),
+          routes: r,
           home: WelcomeScreen(),
         ),
       );
@@ -50,14 +50,14 @@ class regulator extends StatelessWidget {
             ],
             supportedLocales: localizationDelegate.supportedLocales,
             locale: localizationDelegate.currentLocale,
-            routes: routes(licenseText),
+            routes: r,
             home: HomePage(),
           ));
     }
   }
 }
 
-regulatorAsync(licenseText) async {
+regulatorAsync() async {
   try {
     await sqlHandler.openDB(
         "main.db", 1, "CREATE TABLE main (key TEXT, value)");
@@ -70,7 +70,6 @@ regulatorAsync(licenseText) async {
   var db = await sqlHandler.openDB(
       "main.db", 1, "CREATE TABLE main (key TEXT, value)");
   var a = await sqlHandler.query(db, "main", "key = 'newuser'");
-  print(a);
   if (a.length == 0) {
     // if it doesn't exist, create it
     await sqlHandler.insert(db, "main", {"key": "newuser", "value": "true"});
@@ -78,6 +77,6 @@ regulatorAsync(licenseText) async {
   // get the value of the key newuser
   var b = await sqlHandler.query(db, "main", "key = 'newuser'");
   var js = {"newuser": b[0]["value"] == "true"};
-  var c = regulator(js, licenseText);
+  var c = regulator(js, await routes());
   return c;
 }
