@@ -7,7 +7,6 @@ import 'FindDevices.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../basemodules/bluetooth/useBLE.dart';
 import '../modals/CalibrateMotors.dart';
-import 'package:async/async.dart';
 
 const ballSize = 20.0;
 const step = 10.0;
@@ -43,7 +42,7 @@ class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+        _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
           if (_previousCommand != "") {
             _selectedDevice!.send(_previousCommand);
           }
@@ -58,6 +57,7 @@ class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
   }
 
   void _openSecondScreen() {
+    _timer?.cancel();
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -65,6 +65,11 @@ class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
           onDataSubmitted: (CustomBluetoothDevice data) {
             setState(() {
               _selectedDevice = data;
+              _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+                if (_previousCommand != "") {
+                  _selectedDevice!.send(_previousCommand);
+                }
+              });
             });
           },
         ),
@@ -83,36 +88,36 @@ class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
           _x = _x * -1;
           _y = _y * -1;
           setState(() {
-            _previousCommand = "DRIVE,0,0";
+            _previousCommand = "D,0,0";
           });
           
           if (_x == -0) {
             // check if y is positive or negative
             if (_y > 0) {
-              if (_previousCommand != "DRIVE,1,${_y.toInt()}") {
+              if (_previousCommand != "D,1,${_y.toInt()}") {
                 setState(() {
-                  _previousCommand = "DRIVE,1,${_y.toInt()}";
+                  _previousCommand = "D,1,${_y.toInt()}";
                 });
               }
             } else {
-              if (_previousCommand != "DRIVE,2,${_y.toInt()}") {
+              if (_previousCommand != "D,2,${_y.toInt()}") {
                 setState(() {
-                  _previousCommand = "DRIVE,2,${_y.toInt()}";
+                  _previousCommand = "D,2,${_y.toInt()}";
                 });
               }
             }
           } else {
             // check if x is positive or negative
             if (_x > 0) {
-              if (_previousCommand != "DRIVE,3,${_x.toInt()}") {
+              if (_previousCommand != "D,3,${_x.toInt()}") {
                 setState(() {
-                  _previousCommand = "DRIVE,3,${_x.toInt()}";
+                  _previousCommand = "D,3,${_x.toInt()}";
                 });
               }
             } else {
-              if (_previousCommand != "DRIVE,4,${_x.toInt()}") {
+              if (_previousCommand != "D,4,${_x.toInt()}") {
                 setState(() {
-                  _previousCommand = "DRIVE,4,${_x.toInt()}";
+                  _previousCommand = "D,4,${_x.toInt()}";
                 });
               }                                                                                                                                         /////////////;[==]............,,,,mmmmmmmmmmmmmmmmmmm,, .
             }
@@ -136,7 +141,7 @@ class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
       if (_previousCommand != "") {
         _selectedDevice!.send(_previousCommand);
       }
