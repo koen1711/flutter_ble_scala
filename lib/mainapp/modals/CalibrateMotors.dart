@@ -8,7 +8,7 @@ import 'dart:async';
 
 final sqlHandler = SQLHandler();
 
-// make a modal to calibrate the motors
+// make a modal to C the motors
 class CalibrateMotors extends StatefulWidget {
   final Function(String) onDataSubmitted;
   final CustomBluetoothDevice? device;
@@ -16,13 +16,13 @@ class CalibrateMotors extends StatefulWidget {
   CalibrateMotors({required this.onDataSubmitted, required this.device});
 
   @override
-  ACalibrateMotors createState() =>
-      ACalibrateMotors(onDataSubmitted: onDataSubmitted, device: device);
+  ACMotors createState() =>
+      ACMotors(onDataSubmitted: onDataSubmitted, device: device);
 }
 
-class ACalibrateMotors extends State<CalibrateMotors>
-    with WidgetsBindingObserver {
-  ACalibrateMotors({required this.onDataSubmitted, required this.device});
+class ACMotors extends State<CalibrateMotors> with WidgetsBindingObserver {
+  ACMotors({required this.onDataSubmitted, required this.device});
+  bool isDragging = false;
   bool driving = false;
   int leftMotor = 50;
   Timer? timer;
@@ -48,36 +48,21 @@ class ACalibrateMotors extends State<CalibrateMotors>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
-          _heartbeat();
-        });
         break;
       case AppLifecycleState.paused:
-        timer?.cancel();
         break;
       default:
         break;
     }
   }
 
-  void _heartbeat() {
-    
-    if (driving) {
-      print("heartbeat: $driving");
-      device!.send("CALIBRATE,$leftMotor,$rightMotor");
-    } else {
-      device!.send("DRIVE,0,0");
-    }
-  }
+  
 
   Widget build(BuildContext context) {
-    timer = Timer.periodic(Duration(milliseconds: 1000), (timer) {
-      _heartbeat();
-    });
     return Material(
       child: WillPopScope(
         onWillPop: () async {
-          onDataSubmitted("CALIBRATE,$leftMotor,$rightMotor");
+          onDataSubmitted("C,$leftMotor,$rightMotor");
           return true;
         },
         child: Navigator(
@@ -85,7 +70,7 @@ class ACalibrateMotors extends State<CalibrateMotors>
             MaterialPage(
               child: Scaffold(
                 appBar: AppBar(
-                  title: Text("Calibrate Motors"),
+                  title: Text("C Motors"),
                 ),
                 body: Center(
                   child: Column(
@@ -98,6 +83,14 @@ class ACalibrateMotors extends State<CalibrateMotors>
                             value: leftMotor.toDouble(),
                             min: 0,
                             max: 100,
+                            onChangeEnd: (value) {
+                              if (driving) {
+                                device!.send("C,$leftMotor,$rightMotor");
+                              }
+                              setState(() {
+                                leftMotor = value.toInt();
+                              });
+                            },
                             onChanged: (value) {
                               setState(() {
                                 leftMotor = value.toInt();
@@ -110,6 +103,14 @@ class ACalibrateMotors extends State<CalibrateMotors>
                             value: rightMotor.toDouble(),
                             min: 0,
                             max: 100,
+                            onChangeEnd: (value) {
+                              if (driving) {
+                                device!.send("C,$leftMotor,$rightMotor");
+                              }
+                              setState(() {
+                                rightMotor = value.toInt();
+                              });
+                            },
                             onChanged: (value) {
                               setState(() {
                                 rightMotor = value.toInt();
@@ -122,12 +123,13 @@ class ACalibrateMotors extends State<CalibrateMotors>
                                 setState(() {
                                  
                                   driving = !driving;
-                                  print("driving: $driving");
                                   if (driving) {
                                     device!.send(
-                                        "CALIBRATE,$leftMotor,$rightMotor");
+                                        "D,1,100");
+                                    device!.send(
+                                        "C,$leftMotor,$rightMotor");
                                   } else {
-                                    device!.send("DRIVE,0,0");
+                                    device!.send("D,0,0");
                                   }
                                 });
                               },

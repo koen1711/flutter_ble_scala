@@ -55,7 +55,7 @@ class _ALicenseState extends State<ALicense> {
     }
     setState(() {
       license = licenseText;
-      _isLoading = true;
+      _isLoading = false;
     });
     return licenseText;
   }
@@ -134,46 +134,48 @@ class _ALicenseState extends State<ALicense> {
               semanticLabel: 'Back',
             ),
           )),
-      body: Column(
-        children: [
-          _language(context),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              license == ""
-                  ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
+      body: license == ""
+          ? Container(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: Row(
                         children: <Widget>[
                           Expanded(
-                            child: Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: RiveLoading(
-                                    // width and height are the full  width and height of the screen
-                                    width: MediaQuery.of(context).size.width,
-                                    height: MediaQuery.of(context).size.height,
-                                    name: 'lib/mainapp/newusers/loading.riv',
-                                    loopAnimation: 'Timeline 1',
-                                    isLoading: _isLoading,
-                                    onSuccess: (_) {
-                                      print('Finished');
-                                    },
-                                    onError: (err, stack) {
-                                      print(err);
-                                    },
-                                  ),
-                                ),
-                              ],
+                            child: RiveLoading(
+                              // width and height are the full  width and height of the screen
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height,
+                              name: 'lib/mainapp/newusers/loading.riv',
+                              loopAnimation: 'Timeline 1',
+                              isLoading: _isLoading,
+                              onSuccess: (_) {
+                                print('Finished');
+                              },
+                              onError: (err, stack) {
+                                print(err);
+                              },
                             ),
                           ),
                         ],
                       ),
-                    )
-                  : Text(
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : Column(
+              children: [
+                _language(context),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
                       license,
                       textAlign: TextAlign.left,
                       overflow: TextOverflow.fade,
@@ -184,10 +186,10 @@ class _ALicenseState extends State<ALicense> {
                         color: Color(0xff000000),
                       ),
                     ),
-            ],
-          ),
-        ],
-      ),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 }

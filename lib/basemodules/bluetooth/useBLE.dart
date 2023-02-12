@@ -191,11 +191,14 @@ class CustomBluetoothDevice {
 
   Future<bool> send(String data) async {
     // send data to device
-    final Uint8List dataList = Uint8List.fromList(utf8.encode(data));
+
+    final Uint8List dataList = Uint8List.fromList(utf8.encode(data + "\r\n"));
     if (con != null) {
+      await con!.output.allSent;
       con!.output.add(dataList);
     } else {
       await connect();
+      await con!.output.allSent;
       con!.output.add(dataList);
     }
     return true;
