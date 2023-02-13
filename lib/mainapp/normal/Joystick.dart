@@ -7,6 +7,8 @@ import 'FindDevices.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../basemodules/bluetooth/useBLE.dart';
 import '../modals/CalibrateMotors.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:flutter_cube/flutter_cube.dart';
 
 const ballSize = 20.0;
 const step = 10.0;
@@ -65,7 +67,8 @@ class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
           onDataSubmitted: (CustomBluetoothDevice data) {
             setState(() {
               _selectedDevice = data;
-              _timer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+              _timer =
+                  Timer.periodic(const Duration(milliseconds: 1000), (timer) {
                 if (_previousCommand != "") {
                   _selectedDevice!.send(_previousCommand);
                 }
@@ -90,7 +93,7 @@ class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
           setState(() {
             _previousCommand = "D,0,0";
           });
-          
+
           if (_x == -0) {
             // check if y is positive or negative
             if (_y > 0) {
@@ -119,7 +122,7 @@ class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
                 setState(() {
                   _previousCommand = "D,4,${_x.toInt()}";
                 });
-              }                                                                                                                                         /////////////;[==]............,,,,mmmmmmmmmmmmmmmmmmm,, .
+              }
             }
           }
         },
@@ -166,29 +169,95 @@ class _Joystick extends State<AJoystick> with WidgetsBindingObserver {
             ),
             Align(
               alignment: const Alignment(0, 0.8),
-              child: Column(
-                children: [
-                  _selectedDevice == null ? Container() : ElevatedButton(
-                    onPressed: () async {
-                      // go to calibrate motors modal
-                      showBarModalBottomSheet(context: context, 
-                        builder: (context) => CalibrateMotors(
-                          onDataSubmitted: (r) async {
-                            // send command to calibrate motors
-                            _selectedDevice!.send(r);
-                          },
-                          device: _selectedDevice,
-                        )
-                      );
-                    }, 
-                    child: Container(
-                      width: 200,
-                      child: const Text("Calibrate Motors")
-                    )
+              child: Column(children: [
+                Stack(children: <Widget>[
+                  Container(
+                    width: 360,
+                    height: 400,
+                    child: Cube(
+                      interactive: false,
+                      onSceneCreated: (Scene scene) {
+                        // add texture to the scene
+                        //add button to the scene
+
+                        scene.world.add(Object(
+                          fileName: 'assets/models/Arduino.obj',
+                          position: Vector3(0, 0, 0),
+                          scale: Vector3(7.5, 7.5, 7.5),
+                          rotation: Vector3(180, 270, 90),
+                          // add a texture to the object
+                      	));
+                      },
+                    ),
                   ),
-                  _joyStick()
-                ]
-              ),
+                  Positioned(
+                    width: 10,
+                    height: 85,
+                    bottom: 55,
+                    left: 280,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        
+                      },
+                      child: Text(""),
+                    ),
+                  ),
+                  Positioned(
+                    width: 10,
+                    height: 85,
+                    bottom: 150,
+                    left: 280,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        
+                      },
+                      child: Text(""),
+                    ),
+                  ),
+                  Positioned(
+                    width: 10,
+                    height: 70,
+                    bottom: 55,
+                    left: 73,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        
+                      },
+                      child: Text(""),
+                    ),
+                  ),
+                  Positioned(
+                    width: 10,
+                    height: 70,
+                    bottom: 130,
+                    left: 73,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        print("Button 2");
+                      },
+                      child: Text(""),
+                    ),
+                  )
+                ]),
+                _selectedDevice == null
+                    ? Container()
+                    : ElevatedButton(
+                        onPressed: () async {
+                          // go to calibrate motors modal
+                          showBarModalBottomSheet(
+                              context: context,
+                              builder: (context) => CalibrateMotors(
+                                    onDataSubmitted: (r) async {
+                                      // send command to calibrate motors
+                                      _selectedDevice!.send(r);
+                                    },
+                                    device: _selectedDevice,
+                                  ));
+                        },
+                        child: Container(
+                            width: 200, child: const Text("Calibrate Motors"))),
+                _joyStick()
+              ]),
             ),
           ],
         ),
